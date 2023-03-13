@@ -1,0 +1,43 @@
+<html>
+<head>
+<link rel = "stylesheet" href = "https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+</head>
+<body>
+
+<h1>資工選課課表<h1>
+<table id="csie" class="table table-striped table-hover">
+  <tr>
+    <th>開課單位</th>
+    <th>開課名稱</th>
+    <th>授課老師</th>
+   </tr>
+  <tr>
+    <td>資工系</td>
+    <td>物件導向軟體設計1</td>
+    <td>黃</td>
+   </tr>
+  <tr>
+    <td>資工系</td>
+    <td>物件導向軟體設計2</td>
+    <td>崇</td>
+   </tr>  
+  <tr>
+    <td>資工系</td>
+    <td>物件導向軟體設計3</td>
+    <td>源</td>
+   </tr>  
+  <tr>
+    <td>資工系</td>
+    <td>物件導向軟體設計4</td>
+    <td>黃崇源源</td>
+   </tr>
+ </table>  
+<button onclick="changeResult()">Change</button>
+<script>
+ function changeResult() {
+   var myTable = document.getElementById("csie");
+   myTable.rows[1].cells[2].innerHTML = "李春良";
+ }
+ </script>
+ </body>
+ </html>
