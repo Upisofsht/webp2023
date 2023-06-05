@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .container {
+            margin-top: 30px;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .search-container input[type="text"] {
+            padding: 10px;
+            width: 30%;
+            font-size: 15px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #1E88E5;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .pagination-container button {
+            margin: 0 5px;
+            padding: 6px 12px;
+            border-radius: 4px;
+            background-color: #1E88E5;
+            color: white;
+            border: none;
+        }
+
+        .pagination-container button:hover {
+            background-color: #1565C0;
+            cursor: pointer;
+        }
+
+        .pagination-container span {
+            margin: 0 5px;
+            font-weight: bold;
+        }
+    </style>
+    </head>
+    <body>
+        <h1>景點觀光展覽資訊</h1>
+        <input id="search" type="text" onchange="search()" placeholder="關鍵字搜尋">
+        <table id="csie" class="table table-striped table-hover">
+            <tr>
+                <th>名稱</th>
+                <th>地點</th>
+                <th>票價</th>
+            </tr>
+        </table>
+        <button onclick="pre_page()">上一頁</button>
+        <span id="cur">1</span>
+        <span>/</span>
+        <span id="endpage">1</span>
+        <span>頁</span>
+        <button onclick="next_page()">下一頁</button>
+    </body>
+    <script>
+        var cur = 1;
+        const maxdata = 10;
+        var endpage = 1;
+        var datax = [];
+        var openUrl = "https://cloud.culture.tw/frontsite/trans/SearchShowAction.do?method=doFindTypeJ&category=6"
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', openUrl, true);
+        xhr.send();
+        xhr.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                datax = JSON.parse(this.responseText);
+                addData();
+                Update_Page();
+            }
+        };
+
+        function addData() {
+            var start_data = (cur - 1) * maxdata;
+            var end_data = Math.min(start_data + maxdata, datax.length) ;
+            endpage = Math.ceil(datax.length / maxdata);
+            var myTable = document.getElementById("csie");
+            var major_row = myTable.rows[0].cloneNode(true);
+            myTable.innerHTML = "";
+            myTable.appendChild(major_row);
+            for (var i = start_data; i < end_data; i++) {
+                var data = datax[i];
+                var row = myTable.insertRow(-1);
+                row.insertCell(0).innerHTML =  data['title'];
+                row.insertCell(1).innerHTML =  data['showInfo'][0]['location'];
+                row.insertCell(2).innerHTML =  data['showInfo'][0]['price'];
+            }
+            if (endpage == 0) { 
+                cur = 0;
+            }
+        }
+
+
+        function next_page() {
+            if (cur < endpage) {
+                cur += 1;
+                addData();
+                Update_Page();
+            }
+        }
+      
+        function pre_page() {
+            if (cur <= 1) {
+                cur = 1;
+            } else {
+                cur -= 1;
+            }
+            addData();
+            Update_Page();
+        }
+
+        function Update_Page() {
+            var curPage = document.getElementById("cur");
+            var totalPage = document.getElementById("endpage");
+            curPage.innerHTML = cur.toString();
+            totalPage.innerHTML = endpage.toString();
+        }
+        
+        function search() {
+            cur = 1;
+            datax = [];
+            var keyword = document.getElementById("search").value.toLowerCase();
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', openUrl, true);
+            xhr.send();
+            xhr.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    datax = JSON.parse(this.responseText);
+                    if (keyword) {
+                        datax = datax.filter(function (data) {
+                            return data['title'].toLowerCase().indexOf(keyword) > -1;
+                        });
+                    }
+                    addData();
+                    Update_Page();
+                }   
+            };
+        }
+
+    </script>
+</html>
